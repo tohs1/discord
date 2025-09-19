@@ -1,10 +1,13 @@
 // build.js
 import fs from "fs";
 import fetch from "node-fetch";
+
 const config = JSON.parse(fs.readFileSync("config.json", "utf8"));
 
 async function build() {
   if (!fs.existsSync("invites")) fs.mkdirSync("invites");
+
+  const generated = []; // store {id, html} for optional index.html
 
   for (const inviteId of config.invites) {
     const res = await fetch(
@@ -35,6 +38,41 @@ async function build() {
     button { margin:10px; padding:10px 20px; border:none; border-radius:6px; cursor:pointer; }
     .accept { background:#5865f2; color:white; }
     .dismiss { background:#99aab5; color:black; }
+  </style>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const params = new URLSearchParams(window.location.search);
+      if (params.has("join")) {
+        window.location.href = "https://discord.gg/${inviteId}";
+      }
+    });
+  </script>
+</head>
+<body>
+  <div class="box">
+    <img src="${guildIcon}" width="64" height="64" style="border-radius:50%"><br><br>
+    <h2>${guildName}</h2>
+    <p>Invited by ${inviter}</p>
+    <button class="accept" onclick="window.location.href='?join'">Accept Invite</button>
+    <button class="dismiss" onclick="history.back()">Dismiss</button>
+  </div>
+</body>
+</html>`;
+
+    fs.writeFileSync(`invites/${inviteId}.html`, html);
+    console.log(`Built invites/${inviteId}.html`);
+
+    generated.push({ id: inviteId, html });
+  }
+
+  // Optional index.html at root
+  if (typeof config.index === "number" && generated[config.index]) {
+    fs.writeFileSync("index.html", generated[config.index].html);
+    console.log(`Built index.html (from invite ${generated[config.index].id})`);
+  }
+}
+
+build();    .dismiss { background:#99aab5; color:black; }
   </style>
   <script>
     document.addEventListener("DOMContentLoaded", () => {
