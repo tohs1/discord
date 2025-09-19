@@ -30,41 +30,13 @@ async function build() {
   <meta property="og:title" content="${guildName}">
   <meta property="og:description" content="${description}">
   <meta property="og:image" content="${guildIcon}">
-  <meta property="og:url" content="/invites/${inviteId}.html">
+  <meta property="og:url" content="https://discord.gg/${inviteId}">
   <meta name="twitter:card" content="summary_large_image">
-  <style>
-    body { font-family: sans-serif; background:#2c2f33; color:#fff; display:flex; justify-content:center; align-items:center; height:100vh; }
-    .box { background:#23272a; padding:2em; border-radius:10px; text-align:center; max-width:400px; }
-    button { margin:10px; padding:10px 20px; border:none; border-radius:6px; cursor:pointer; }
-    .accept { background:#5865f2; color:white; }
-    .dismiss { background:#99aab5; color:black; }
-    @media (max-width: 500px) {
-      .box {
-        padding: 1em;
-      }
-      button {
-        padding: 0.5em 1em;
-        font-size: 0.9em;
-      }
-    }
-  </style>
   <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const params = new URLSearchParams(window.location.search);
-      if (params.has("join")) {
-        window.location.href = "https://discord.gg/${inviteId}";
-      }
-    });
+    window.location.href = "https://discord.gg/${inviteId}";
   </script>
 </head>
 <body>
-  <div class="box">
-    <img src="${guildIcon}" width="64" height="64" style="border-radius:50%"><br><br>
-    <h2>${guildName}</h2>
-    <p>Invited by ${inviter}</p>
-    <button class="accept" onclick="window.location.href='?join'">Accept Invite</button>
-    <button class="dismiss" onclick="history.back()">Dismiss</button>
-  </div>
 </body>
 </html>`;
 
@@ -73,7 +45,8 @@ async function build() {
 
     generated.push({ id: inviteId, html });
   }
-  
+
+  // Optional index.html at root
   if (typeof config.index === "number" && generated[config.index]) {
     fs.writeFileSync("index.html", generated[config.index].html);
     console.log(`Built index.html (from invite ${generated[config.index].id})`);
