@@ -1,7 +1,6 @@
 // build.js
 import fs from "fs";
 import fetch from "node-fetch";
-
 const config = JSON.parse(fs.readFileSync("config.json", "utf8"));
 
 async function build() {
@@ -24,11 +23,11 @@ async function build() {
 <html>
 <head>
   <meta charset="utf-8" />
-  <title>Join ${guildName} on Discord</title>
-  <meta property="og:title" content="Join ${guildName} on Discord">
+  <title>${guildName}</title>
+  <meta property="og:title" content="${guildName}">
   <meta property="og:description" content="${description}">
   <meta property="og:image" content="${guildIcon}">
-  <meta property="og:url" content="https://yourusername.github.io/invites/${inviteId}.html">
+  <meta property="og:url" content="/invites/${inviteId}.html">
   <meta name="twitter:card" content="summary_large_image">
   <style>
     body { font-family: sans-serif; background:#2c2f33; color:#fff; display:flex; justify-content:center; align-items:center; height:100vh; }
@@ -37,15 +36,22 @@ async function build() {
     .accept { background:#5865f2; color:white; }
     .dismiss { background:#99aab5; color:black; }
   </style>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const params = new URLSearchParams(window.location.search);
+      if (params.has("join")) {
+        window.location.href = "https://discord.gg/${inviteId}";
+      }
+    });
+  </script>
 </head>
 <body>
   <div class="box">
     <img src="${guildIcon}" width="64" height="64" style="border-radius:50%"><br><br>
     <h2>${guildName}</h2>
     <p>Invited by ${inviter}</p>
-    <button class="accept" onclick="window.location.href='https://discord.com/invite/${inviteId}'">Accept Invite</button>
+    <button class="accept" onclick="window.location.href='?join'">Accept Invite</button>
     <button class="dismiss" onclick="history.back()">Dismiss</button>
-    <button class="accept" onclick="window.location.href='https://discord.gg/${inviteId}?join'">Join Now</button>
   </div>
 </body>
 </html>`;
