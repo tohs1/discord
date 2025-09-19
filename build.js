@@ -38,6 +38,15 @@ async function build() {
     button { margin:10px; padding:10px 20px; border:none; border-radius:6px; cursor:pointer; }
     .accept { background:#5865f2; color:white; }
     .dismiss { background:#99aab5; color:black; }
+    @media (max-width: 500px) {
+      .box {
+        padding: 1em;
+      }
+      button {
+        padding: 0.5em 1em;
+        font-size: 0.9em;
+      }
+    }
   </style>
   <script>
     document.addEventListener("DOMContentLoaded", () => {
