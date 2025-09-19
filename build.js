@@ -1,11 +1,11 @@
 // build.js
 import fs from "fs";
 import fetch from "node-fetch";
-
 const config = JSON.parse(fs.readFileSync("config.json", "utf8"));
-
 async function build() {
   if (!fs.existsSync("invites")) fs.mkdirSync("invites");
+
+  let generated = []; // store {id, html} for possible index copy
 
   for (const inviteId of config.invites) {
     const res = await fetch(
@@ -24,17 +24,45 @@ async function build() {
 <html>
 <head>
   <meta charset="utf-8" />
-  <title>Join ${guildName} on Discord</title>
-  <meta property="og:title" content="Join ${guildName} on Discord">
+  <title>${guildName}</title>
+  <meta property="og:title" content="${guildName}">
   <meta property="og:description" content="${description}">
   <meta property="og:image" content="${guildIcon}">
-  <meta property="og:url" content="https://yourusername.github.io/invites/${inviteId}.html">
+  <meta property="og:url" content="https:///invites/${inviteId}.html">
   <meta name="twitter:card" content="summary_large_image">
   <style>
     body { font-family: sans-serif; background:#2c2f33; color:#fff; display:flex; justify-content:center; align-items:center; height:100vh; }
     .box { background:#23272a; padding:2em; border-radius:10px; text-align:center; max-width:400px; }
     button { margin:10px; padding:10px 20px; border:none; border-radius:6px; cursor:pointer; }
     .accept { background:#5865f2; color:white; }
+    .dismiss { background:#99aab5; color:black; }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <img src="${guildIcon}" width="64" height="64" style="border-radius:50%"><br><br>
+    <h2>${guildName}</h2>
+    <p>Invited by ${inviter}</p>
+    <button class="accept" onclick="window.location.href='https://discord.gg/${inviteId}'">Accept Invite</button>
+    <button class="dismiss" onclick="history.back()">Dismiss</button>
+  </div>
+</body>
+</html>`;
+
+    fs.writeFileSync(`invites/${inviteId}.html`, html);
+    console.log(`Built invites/${inviteId}.html`);
+
+    generated.push({ id: inviteId, html });
+  }
+
+  // Optional index.html
+  if (typeof config.index === "number" && generated[config.index]) {
+    fs.writeFileSync("index.html", generated[config.index].html);
+    console.log(`Built index.html (from invite ${generated[config.index].id})`);
+  }
+}
+
+build();    .accept { background:#5865f2; color:white; }
     .dismiss { background:#99aab5; color:black; }
   </style>
 </head>
